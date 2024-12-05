@@ -99,13 +99,14 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     """
     # Number of instances
     N = boxes.shape[0]
+    #print(N)
     if not N:
         print("\n*** No instances to display *** \n")
     else:
         assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
 
     # If no axis is passed, create one and automatically call show()
-    auto_show = False
+    auto_show = True
     if not ax:
         _, ax = plt.subplots(1, figsize=figsize)
         auto_show = True
@@ -118,12 +119,12 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     ax.set_ylim(height + 10, -10)
     ax.set_xlim(-10, width + 10)
     ax.axis('off')
-    ax.set_title(title)
-
+    
+    imask=1
     masked_image = image.astype(np.uint32).copy()
     for i in range(N):
         color = colors[i]
-
+        
         # Bounding box
         if not np.any(boxes[i]):
             # Skip this instance. Has no bbox. Likely lost in image cropping.
@@ -148,6 +149,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
 
         # Mask
         mask = masks[:, :, i]
+        
         if show_mask:
             masked_image = apply_mask(masked_image, mask, color)
 
@@ -162,9 +164,15 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             verts = np.fliplr(verts) - 1
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
+            imask+=1
+        print(imask)
+    
     ax.imshow(masked_image.astype(np.uint8))
+    ax.set_title('pigs number is {}'.format(imask))
+    #plt.savefig(name)
+    plt.show()
     if auto_show:
-        plt.show()
+       plt.show()
 
 
 def display_differences(image,
@@ -260,10 +268,10 @@ def draw_rois(image, rois, refined_rois, mask, class_ids, class_names, limit=10)
     ax.imshow(masked_image)
 
     # Print stats
-    print("Positive ROIs: ", class_ids[class_ids > 0].shape[0])
+    '''print("Positive ROIs: ", class_ids[class_ids > 0].shape[0])
     print("Negative ROIs: ", class_ids[class_ids == 0].shape[0])
     print("Positive Ratio: {:.2f}".format(
-        class_ids[class_ids > 0].shape[0] / class_ids.shape[0]))
+        class_ids[class_ids > 0].shape[0] / class_ids.shape[0]))'''
 
 
 # TODO: Replace with matplotlib equivalent?
